@@ -47,13 +47,13 @@ Insure.prototype.quoteInsure = (brand, year,type) => {
 
 function Interface() {}
 
-Interface.prototype.getError = (message, type) => {
+Interface.prototype.getMessage = (message, type) => {
     let div = document.createElement('div')
 
     if (type === 'error') {
         div.classList.add('message', 'error')
     } else {
-        div.classListadd('message', 'correcto')
+        div.classList.add('message', 'correcto')
     }
     div.innerHTML = `${message}`
     form.insertBefore(div, document.querySelector('.form-group'))
@@ -82,15 +82,21 @@ Interface.prototype.getResult = (ins, qua) => {
 
     let div = document.createElement('div')
     div.innerHTML = `
-        Tu Resumen:
-
-        MARCA: ${ins.brand}.
-        AÑO: ${ins.year}.
-        TIPO: ${ins.type}.
-
-        Total: ${qua}.
+        <p class="header">
+            Resumen:            
+        </p>
+        <p>MARCA: ${ins.brand}. </p>
+        <p>AÑO: ${ins.year}.    </p>
+        <p>TIPO: ${ins.type}.   </p>
+        <br>
+        <p>TOTAL: ${qua}.       </p>
     `
-    result.appendChild(div)
+    const spinner = document.querySelector('#cargando img')
+    spinner.style.display = 'block'
+    setTimeout(() => {
+        spinner.style.display = 'none'
+        result.appendChild(div)
+    }, 3000)
 }
 
 const form = document.getElementById('cotizar-seguro')
@@ -107,12 +113,19 @@ form.addEventListener('submit', (e) => {
     const interface = new Interface();
 
     if (selectedBrand === '' || selectedYear === '' || type === '') {
-         interface.getError('Faltan datos, revisa el formulario e intenta de nuevo', 'error')
+         interface.getMessage('Faltan datos, revisa el formulario e intenta de nuevo', 'error')
     } else {
+        const results = document.querySelector('#resultado div')
+
+        if (results != null ) {
+            results.remove()
+        }
+
         const insure = new Insure(selectedBrand, selectedYear, type)
 
         const quantity = insure.quoteInsure(selectedBrand, selectedYear, type)
         interface.getResult(insure, quantity)
+        interface.getMessage('Cotizando...', 'correcto')
     }
 }) 
 
